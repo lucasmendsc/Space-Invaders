@@ -1,37 +1,53 @@
 local physics = require("physics")
 
-enemyShips = {
-    fisrtColumn = {
-                    ship1 = display.newImage("Game Images/darkEnemy.png",40,10),
-                    ship2 = display.newImage("Game Images/darkEnemy.png",40,80),
-                    ship3 = display.newImage("Game Images/whiteEnemy.png",40,150),
-                    ship4 = display.newImage("Game Images/whiteEnemy.png",40,220)
-                    },
-    secondColumn = {
-                    ship5 = display.newImage("Game Images/darkEnemy.png",110,10),
-                    ship6 = display.newImage("Game Images/darkEnemy.png",110,80),
-                    ship7 = display.newImage("Game Images/whiteEnemy.png",110,150),
-                    ship8 = display.newImage("Game Images/whiteEnemy.png",110,220)
-                    },
-    thirdColumn = {
-                    ship9 = display.newImage("Game Images/darkEnemy.png",180,10),
-                    ship10 = display.newImage("Game Images/darkEnemy.png",180,80),
-                    ship11 = display.newImage("Game Images/whiteEnemy.png",180,150),
-                    ship12 = display.newImage("Game Images/whiteEnemy.png",180,220)
-                    },
-    fourthColumn = {
-                    ship13 = display.newImage("Game Images/darkEnemy.png",250,10),
-                    ship14 = display.newImage("Game Images/darkEnemy.png",250,80),
-                    ship15 = display.newImage("Game Images/whiteEnemy.png",250,150),
-                    ship16 = display.newImage("Game Images/whiteEnemy.png",250,220)
-                    }
-            }
+enemyShips = {{},{},{},{}} 
+                   
+function enemyShips:setShips()
+    x = 40
+    y = 10
+    for i=1,4 do
+        if i ~= 1 then
+            x = x + 70
+        end
 
-function enemyShips:shoot()
+        for j=1,4 do
+            if j ~= 1 then
+                y = y + 70
+            end
+            if j > 2 then
+                 enemyShips[i][j] = display.newImage("Game Images/whiteEnemy.png",x,y)
+            else
+                enemyShips[i][j] = display.newImage("Game Images/darkEnemy.png",x,y)
+            end
+        end
+        y = 10
+    end 
+end
+
+enemyShips:setShips()
+
+function enemyShips:addPhysic()
     for i=1,4 do
         for j=1,4 do
+            physics.addBody(enemyShips[i][j],"dinamyc")
         end
     end
+
 end
+
+enemyShips:addPhysic()
+
+function enemyShips:moveShips()
+    local function moveLeft()
+        for i=1,4 do
+            for j=1,4 do
+                enemyShips[i][j].x = enemyShips[i][j].x + 5
+            end
+        end
+    end
+
+        timerMoveEnemysLeft = timer.performWithDelay(800,moveLeft,0)
+end
+enemyShips:moveShips()
 
 return enemyShips

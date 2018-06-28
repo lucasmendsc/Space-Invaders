@@ -30,14 +30,14 @@ function onShipCollision(event)
     player:gameOver(player.lifes)
 end
 
+function player:onStartFunctions()
+    physics.start()
+    physics.addBody(player.playerShip,"static")
+
 function onShotCollision()
     display.remove(shot)
     timer.cancel(timerPlayerShipShot)
 end
-
-function player:onStartFunctions()
-    physics.start()
-    physics.addBody(player.playerShip,"static")
     player.playerShip:addEventListener( "collision", onShipCollision )
     system.setAccelerometerInterval( 60 )
     Runtime:addEventListener ("accelerometer", onAccelerate)
