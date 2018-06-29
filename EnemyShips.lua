@@ -1,7 +1,9 @@
 local physics = require("physics")
 
 enemyShips = {{},{},{},{}} 
-                   
+rightMovement = true
+timerMoveEnemys = nil
+
 function enemyShips:setShips()
     x = 40
     y = 10
@@ -23,8 +25,8 @@ function enemyShips:setShips()
         y = 10
     end 
 end
-enemyShips:setShips()
-function shipColisionListiners()
+
+function enemyShips:shipColisionListiners()
 
     local function ship1ColisionListiner()
         display.remove(enemyShips[1][1])
@@ -107,11 +109,8 @@ function shipColisionListiners()
     enemyShips[4][2]:addEventListener( "collision", ship14ColisionListiner )
     enemyShips[4][3]:addEventListener( "collision", ship15ColisionListiner )
     enemyShips[4][4]:addEventListener( "collision", ship16ColisionListiner )
-
 end
 
-
-shipColisionListiners()
 function enemyShips:addPhysic()
     for i=1,4 do
         for j=1,4 do
@@ -121,22 +120,76 @@ function enemyShips:addPhysic()
     end
 
 end
-physics.start()
-enemyShips:addPhysic()
 
-function enemyShips:moveShips()
-    local function moveLeft()
-        for i=1,4 do
-            for j=1,4 do
-                if enemyShips[i][j].x ~= nil then
-                    enemyShips[i][j].x = enemyShips[i][j].x + 10
-                end
+local function moveRight()
+    for i=1,4 do
+        for j=1,4 do
+            if enemyShips[i][j].x ~= nil then
+                enemyShips[i][j].x = enemyShips[i][j].x + 30
+                checkEdges(enemyShips[i][j].x)
             end
         end
     end
+    timerMoveEnemys = timer.performWithDelay(800,moveRight,0) 
+end     
 
-        timerMoveEnemysLeft = timer.performWithDelay(800,moveLeft,0)
+function moveLeft()
+    for i=1,4 do
+        for j=1,4 do
+            if enemyShips[i][j].x ~= nil then
+                enemyShips[i][j].x = enemyShips[i][j].x - 30
+                checkEdges(enemyShips[i][j].x)
+            end
+        end
+    end
+    timerMoveEnemys = timer.performWithDelay(800,moveLeft,0) 
 end
-enemyShips:moveShips()
+
+function moveDown()
+   for i=1,4 do
+        for j=1,4 do
+            if enemyShips[i][j].x ~= nil then
+                enemyShips[i][j].y = enemyShips[i][j].y + 30
+            end
+        end
+    end
+    timerMoveEnemysDown = timer.performWithDelay(800,moveDown,0)
+    timer.cancel(timerMoveEnemysDown)
+end
+
+
+function enemyShips:moveShips()
+    if timerMoveEnemys ~= nil then
+        if firstMovement then
+            timer.cancel(timerMoveEnemys)
+            moveDown()
+            moveRight()
+            rightMovement = false
+        else
+            timer.cancel(timerMoveEnemys)
+            moveDown()
+            moveLeft()
+            rightMovement = true
+        end
+    else
+        moveRight()
+        rightMovement = false
+    end
+end
+
+function checkEdges(x)
+    if x > 310 then
+        enemyShips:moveShips()
+    elseif x < 5 then
+        enemyShips:moveShips()
+    end
+end
+
+function enemyShips:onStart()
+    enemyShips:setShips()
+    enemyShips:shipColisionListiners()
+    enemyShips:addPhysic()
+    --enemyShips:moveShips()
+end
 
 return enemyShips

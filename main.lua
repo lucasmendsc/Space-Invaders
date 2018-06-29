@@ -1,1 +1,3 @@
-require "Game"
+game = require "Game"
+
+game:startGame()

@@ -16,48 +16,48 @@ local function onAccelerate(event)
     end
 end
 
+function onShotCollision()
+    display.remove(shot)
+    timer.cancel(timerPlayerShipShot)
+end
+
 function shoot( event )
     if event.phase == "began" then
-       shot = player:createBullet()
+        shot = player:createBullet()
+        table.insert(player.shots,shot)
 
             local function moveShot()
-                shot.y = shot.y - 5
-                removeShot(shot)
+                if ableToMoveShot(shot) then
+                    for i,shot in pairs(player.shots) do
+                        shot.y = shot.y - 5
+                    end
+                end
             end
+
         timerPlayerShipShot = timer.performWithDelay(10,moveShot,0)
     end
 end
 
-function removeShot(shot)
-  --[[]  if shot.y == 25 then
+function ableToMoveShot(shot)
+    if shot.y < 2 then
         display.remove(shot)
-    end]]
+        timer.cancel(timerPlayerShipShot)
+        return false
+    else 
+        return true
+    end
 end
-
-Runtime:addEventListener("touch",shoot)
 
 function onShipCollision(event)
     transition.fadeOut( player.playerShip, { time=500 })
     player:gameOver(player.lifes)
 end
 
-function player:onStartFunctions()
-    physics.start()
-    physics.addBody(player.playerShip,"static")
-end
-
-function onShotCollision()
-    display.remove(shot)
-    timer.cancel(timerPlayerShipShot)
-end
-    player.playerShip:addEventListener( "collision", onShipCollision )
-    system.setAccelerometerInterval( 60 )
-    Runtime:addEventListener ("accelerometer", onAccelerate)
-
 function player:createBullet()
     shot = display.newRect(player.playerShip.x,player.playerShip.y -40 , 5, 25)
     physics.addBody(shot,"dynamic")
     shot.gravityScale = 0
+    shot:addEventListener( "collision", onShotCollision )
     return shot
 end
 
@@ -75,6 +75,14 @@ function player:gameOver(lifes)
     else
         player.lifes = player.lifes - 1
     end
+end
+
+function player:onStartFunctions()
+    physics.addBody(player.playerShip,"static")
+    player.playerShip:addEventListener( "collision", onShipCollision )
+    system.setAccelerometerInterval( 60 )
+    Runtime:addEventListener ("accelerometer", onAccelerate)
+    Runtime:addEventListener("touch",shoot)
 end
 
 return player
