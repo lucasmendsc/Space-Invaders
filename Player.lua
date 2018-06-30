@@ -1,4 +1,5 @@
 local physics = require("physics")
+
 player = {lifes = 3, 
         playerShip = display.newImage("Game Images/playerShip.png",160,460),
         shots ={}
@@ -25,10 +26,10 @@ function shoot( event )
     if event.phase == "began" then
         shot = player:createBullet()
         table.insert(player.shots,shot)
-
+        shot.isBullet = true
             local function moveShot()
                 if ableToMoveShot(shot) then
-                    for i,shot in pairs(player.shots) do
+                    for i,shot in ipairs(player.shots) do
                         shot.y = shot.y - 5
                     end
                 end
@@ -50,6 +51,7 @@ end
 
 function onShipCollision(event)
     transition.fadeOut( player.playerShip, { time=500 })
+    transition.fadeOut( player.playerShip, { time=500 })
     player:gameOver(player.lifes)
 end
 
@@ -58,6 +60,7 @@ function player:createBullet()
     physics.addBody(shot,"dynamic")
     shot.gravityScale = 0
     shot:addEventListener( "collision", onShotCollision )
+    shot.isBullet = true
     return shot
 end
 
@@ -71,7 +74,7 @@ end
 
 function player:gameOver(lifes)
     if player.lifes == 0 then
-        --startOver()
+        display.remove(player.playerShip)
     else
         player.lifes = player.lifes - 1
     end

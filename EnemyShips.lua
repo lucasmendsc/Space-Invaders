@@ -3,6 +3,7 @@ local physics = require("physics")
 enemyShips = {{},{},{},{}} 
 rightMovement = true
 timerMoveEnemys = nil
+timerMoveEnemysDown = nil
 
 function enemyShips:setShips()
     x = 40
@@ -121,67 +122,80 @@ function enemyShips:addPhysic()
 
 end
 
-local function moveRight()
+function moveRight()
     for i=1,4 do
         for j=1,4 do
             if enemyShips[i][j].x ~= nil then
-                enemyShips[i][j].x = enemyShips[i][j].x + 30
+                enemyShips[i][j].x = enemyShips[i][j].x + 15
                 checkEdges(enemyShips[i][j].x)
             end
         end
     end
-    timerMoveEnemys = timer.performWithDelay(800,moveRight,0) 
-end     
+    
+end   
 
 function moveLeft()
     for i=1,4 do
         for j=1,4 do
             if enemyShips[i][j].x ~= nil then
-                enemyShips[i][j].x = enemyShips[i][j].x - 30
+                enemyShips[i][j].x = enemyShips[i][j].x - 15
                 checkEdges(enemyShips[i][j].x)
             end
         end
     end
-    timerMoveEnemys = timer.performWithDelay(800,moveLeft,0) 
-end
+     
+end   
 
 function moveDown()
    for i=1,4 do
         for j=1,4 do
             if enemyShips[i][j].x ~= nil then
-                enemyShips[i][j].y = enemyShips[i][j].y + 30
+                enemyShips[i][j].y = enemyShips[i][j].y + 15
             end
         end
     end
-    timerMoveEnemysDown = timer.performWithDelay(800,moveDown,0)
-    timer.cancel(timerMoveEnemysDown)
 end
 
-
 function enemyShips:moveShips()
-    if timerMoveEnemys ~= nil then
-        if firstMovement then
-            timer.cancel(timerMoveEnemys)
-            moveDown()
-            moveRight()
+        if rightMovement then
             rightMovement = false
         else
-            timer.cancel(timerMoveEnemys)
             moveDown()
-            moveLeft()
             rightMovement = true
         end
-    else
-        moveRight()
-        rightMovement = false
-    end
 end
 
 function checkEdges(x)
-    if x > 310 then
+    if x > 300 then
+        timer.cancel(timerMoveEnemys)
+        timerMoveEnemysDown = timer.performWithDelay(800,moveDown,0)
+        timerMoveEnemys = timer.performWithDelay(800,moveLeft,0)
         enemyShips:moveShips()
-    elseif x < 5 then
+        timer.cancel(timerMoveEnemysDown)
+    elseif x < 20 then
+        timer.cancel(timerMoveEnemys)
+        timerMoveEnemysDown = timer.performWithDelay(800,moveDown,0)
+        timerMoveEnemys = timer.performWithDelay(800,moveRight,0)
         enemyShips:moveShips()
+        timer.cancel(timerMoveEnemysDown)
+    end
+end
+
+local function createBullet(ship)
+    shot = display.newRect(ship.x,ship.y +20 , 5, 15)
+    physics.addBody(shot,"dynamic")
+    shot.gravityScale = 5
+    shot.isBullet = true
+    return shot
+end
+
+function onShotColision()
+    display.remove(shot)
+end
+
+function enemyShips:shoot()
+    for i = 1, 4 do
+        shot = createBullet(enemyShips[i][table.maxn(enemyShips[i])])
     end
 end
 
@@ -189,7 +203,9 @@ function enemyShips:onStart()
     enemyShips:setShips()
     enemyShips:shipColisionListiners()
     enemyShips:addPhysic()
-    --enemyShips:moveShips()
+    timerMoveEnemys = timer.performWithDelay(800,moveRight,0)
+    enemyShips:moveShips()
+    --enemyShips:shoot()
 end
 
 return enemyShips
