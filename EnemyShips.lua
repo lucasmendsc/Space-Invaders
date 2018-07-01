@@ -3,7 +3,6 @@ local physics = require("physics")
 enemyShips = {{},{},{},{}} 
 rightMovement = true
 timerMoveEnemys = nil
-timerMoveEnemysDown = nil
 
 function enemyShips:setShips()
     x = 40
@@ -28,7 +27,6 @@ function enemyShips:setShips()
 end
 
 function enemyShips:shipColisionListiners()
-
     local function ship1ColisionListiner()
         display.remove(enemyShips[1][1])
     end

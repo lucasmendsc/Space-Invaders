@@ -2,9 +2,9 @@ local physics = require("physics")
 
 player = {lifes = 3, 
         playerShip = display.newImage("Game Images/playerShip.png",160,460),
-        shots ={}
+        shots ={},
+        ableToShoot = true
         }
-
 
 local function onAccelerate(event)
     player.playerShip.x = display.contentCenterX + 
@@ -50,9 +50,14 @@ function ableToMoveShot(shot)
 end
 
 function onShipCollision(event)
-    transition.fadeOut( player.playerShip, { time=500 })
-    transition.fadeOut( player.playerShip, { time=500 })
+    transition.to(player.playerShip,{ time=1000, alpha=0.3,delay=0})
+    transition.to(player.playerShip,{ time=1000, alpha=1,delay=2500})
     player:gameOver(player.lifes)
+end
+
+function onLastCollision(event)
+    transition.to(player.playerShip,{ time=1000, alpha=0})
+    --endGame()
 end
 
 function player:createBullet()
@@ -64,8 +69,8 @@ function player:createBullet()
     return shot
 end
 
-function player:ableToShoot()
-    if timerPlayerShipShot == nil then
+function player:canShoot()
+    if timerPlayerShipShot == nil or player.ableToShoot == t then
         return true
     else
         return false
@@ -73,7 +78,9 @@ function player:ableToShoot()
 end
 
 function player:gameOver(lifes)
-    if player.lifes == 0 then
+    if player.lifes == 1 then
+        player.playerShip:removeEventListener("collision" , onShipCollision )
+        player.playerShip:addEventListener("collision" , onLastCollision )
         display.remove(player.playerShip)
     else
         player.lifes = player.lifes - 1

@@ -5,7 +5,7 @@ game = {player = require("Player"),
 		}
 
 function game:startGame()
-	physics:start()
+	physics:start(true)
 	game.player:onStartFunctions()
 	game.EnemyShips:onStart()
 end
