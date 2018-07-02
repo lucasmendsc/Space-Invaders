@@ -6,7 +6,7 @@ local rightMovement = true
 
 function enemyShips:setShips()
     x = 20
-    y = 20
+    y = 50
 
     for i=1,4 do
         if i ~= 1 then
@@ -24,7 +24,7 @@ function enemyShips:setShips()
                 enemyShips[i][j] = display.newImage("Game Images/darkEnemy.png",x,y)
             end
         end
-        y = 20
+        y = 50
     end 
 end
 

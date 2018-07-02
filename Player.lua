@@ -2,7 +2,8 @@ local physics = require("physics")
 
 player = {lifes = 3, 
         playerShip = display.newImage("Game Images/playerShip.png",160,460),
-        shotsHited = 0
+        shotsHited = 0,
+        score = 0
         }
 
 local function onAccelerate(event)
@@ -24,12 +25,15 @@ function onShotCollision(event)
     Runtime:addEventListener("touch",shoot)
     shotsHited()
 end
+
 function onExit()
     os.exit()
 end
 
 function shotsHited()
    player.shotsHited = player.shotsHited + 1
+   player.score = player.score + 120
+   showScore()
    if  player.shotsHited >= 16 then
         gameOver()
    end
@@ -63,7 +67,8 @@ function shoot( event )
                 checkShots(shot)
             end
         end
-
+        shotAudio = audio.loadStream("Game Sounds/shoot.wav")
+        audio.play(shotAudio)
     timerPlayerShipShot = timer.performWithDelay(15,moveShot,-1)
 end
 end
@@ -84,6 +89,8 @@ function gameOver()
     else
         text = "Você perdeu..."
     end
+        collisionAudio = audio.loadStream("Game Sounds/explosion.wav")
+        audio.play(collisionAudio)
         finalMessage = display.newText(text, 170, 240, native.systemFont, 40 )
         finalMessage:setFillColor( 0,0,0 )
         timer.performWithDelay(1500,onExit,1)
@@ -92,10 +99,21 @@ end
 function player:lifeCount(lifes)
     if player.lifes > 1 then
         player.lifes = player.lifes - 1
+        showLifes()
     else
         player.playerShip:removeEventListener("collision" , onShipCollision )
         gameOver()
     end
+end
+
+function showScore()
+display.remove(scoreDisplay)
+scoreDisplay = display.newText("Score : " .. player.score,270,30)
+end
+
+function showLifes()
+    display.remove(lifeDisplay)
+    lifeDisplay = display.newText("Lifes : " .. player.lifes,40,30)
 end
 
 function player:onStartFunctions()
@@ -104,6 +122,8 @@ function player:onStartFunctions()
     system.setAccelerometerInterval( 60 )
     Runtime:addEventListener ("accelerometer", onAccelerate)
     Runtime:addEventListener("touch",shoot)
+    lifeDisplay = display.newText("Lifes : " .. player.lifes,40,30)
+    scoreDisplay = display.newText("Score : " .. player.score,270,30)
 end
 
 return player
