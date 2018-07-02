@@ -1,4 +1,4 @@
-game = require "Game"
-physics = require "physics"
+physics = require("physics")
+game = require("Game")
 
 game:startGame()

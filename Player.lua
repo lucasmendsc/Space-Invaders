@@ -1,7 +1,8 @@
 local physics = require("physics")
 
 player = {lifes = 3, 
-        playerShip = display.newImage("Game Images/playerShip.png",160,460)
+        playerShip = display.newImage("Game Images/playerShip.png",160,460),
+        shotsHited = 0
         }
 
 local function onAccelerate(event)
@@ -21,6 +22,17 @@ function onShotCollision(event)
     event.other = nil
     timer.cancel(timerPlayerShipShot)
     Runtime:addEventListener("touch",shoot)
+    shotsHited()
+end
+function onExit()
+    os.exit()
+end
+
+function shotsHited()
+   player.shotsHited = player.shotsHited + 1
+   if  player.shotsHited >= 16 then
+        gameOver()
+   end
 end
 
 function checkShots(shot)
@@ -51,6 +63,7 @@ function shoot( event )
                 checkShots(shot)
             end
         end
+
     timerPlayerShipShot = timer.performWithDelay(15,moveShot,-1)
 end
 end
@@ -62,18 +75,26 @@ function onShipCollision(event)
     display.remove(event.other)
 end
 
-function onLastCollision(event)
-    transition.to(player.playerShip,{ time=1000, alpha=0})
-    --gameOver()
+function gameOver()
+    local text
+    display.newRect( 200, 250, 500, 520 )
+
+    if player.shotsHited >= 16  then
+        text = "Você venceu!"
+    else
+        text = "Você perdeu..."
+    end
+        finalMessage = display.newText(text, 170, 240, native.systemFont, 40 )
+        finalMessage:setFillColor( 0,0,0 )
+        timer.performWithDelay(1500,onExit,1)
 end
 
 function player:lifeCount(lifes)
-    if player.lifes == 1 then
-        player.playerShip:removeEventListener("collision" , onShipCollision )
-        player.playerShip:addEventListener("collision" , onLastCollision )
-        display.remove(player.playerShip)
-    else
+    if player.lifes > 1 then
         player.lifes = player.lifes - 1
+    else
+        player.playerShip:removeEventListener("collision" , onShipCollision )
+        gameOver()
     end
 end
 

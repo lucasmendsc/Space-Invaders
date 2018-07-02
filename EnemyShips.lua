@@ -1,5 +1,6 @@
 local physics = require("physics")
-enemyShips = {{},{},{},{}}
+enemyShips = {{},{},{},{},
+            shipsAlive = 16}
 local bullet = nil 
 local rightMovement = true
 
@@ -22,7 +23,6 @@ function enemyShips:setShips()
             else
                 enemyShips[i][j] = display.newImage("Game Images/darkEnemy.png",x,y)
             end
-
         end
         y = 20
     end 
@@ -104,15 +104,17 @@ local function createBullet(ship)
 end
 
 function pickShipToShoot()
-    shipIndex = math.random(4)
-    x = 4
-    for i=1,4 do
-        if enemyShips[shipIndex][x].y == nil then
-            x = x - 1
-        else
-            bullet = createBullet(enemyShips[shipIndex][x])
-            break
-        end
+    if enemyShips.shipsAlive ~= 0 then
+        shipIndex = math.random(4)
+        x = 4
+            for i=1,4 do
+                if enemyShips[shipIndex][x].y == nil then
+                    x = x - 1
+                else
+                    bullet = createBullet(enemyShips[shipIndex][x])
+                    break
+                end
+            end
     end
 end
 
